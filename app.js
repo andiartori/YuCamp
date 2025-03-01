@@ -14,13 +14,20 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user");
+const helmet = require("helmet");
 
 const userRoutes = require("./routes/users");
 const campgroundsRoutes = require("./routes/campgrounds");
 const reviewsRoutes = require("./routes/reviews");
+const dbUrl = process.env.DB_URL;
+const mySecret = process.env.SECRET
+const MongoStore = require("connect-mongo");
+
+
+//This is local "mongodb://127.0.0.1:27017/yelp-camp"
 
 mongoose
-	.connect("mongodb://127.0.0.1:27017/yelp-camp")
+	.connect(dbUrl)
 	.then(() => {
 		console.log("MONGO CONNECTION SUCCESS");
 	})
@@ -37,12 +44,26 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 
+const store = MongoStore.create({
+	mongoUrl: dbUrl,
+	touchAfter: 24 * 60 * 60,
+	crypto: {
+		secret: mySecret,
+	},
+});
+
+store.on("error", function (e) {
+	console.error("Session store error: ", e);
+});
 const sessionConfig = {
-	secret: "thisshouldbeabettersecret",
+	store,
+	name: "session",
+	secret: mySecret,
 	resave: false,
 	saveUninitialized: true,
 	cookie: {
 		httpOnly: true,
+		// secure : true,
 		expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
 		maxAge: Date.now() + 1000 * 60 * 60 * 24 * 7,
 	},
@@ -50,6 +71,66 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 
 app.use(flash());
+
+app.use(helmet());
+
+const scriptSrcUrls = [
+	"'self'",
+	"'unsafe-inline'",
+	"https://cdn.maptiler.com/",
+	"https://cdn.jsdelivr.net/",
+	"https://stackpath.bootstrapcdn.com/",
+	"https://api.tiles.mapbox.com/",
+	"https://api.maptiler.com/",
+	"https://api.mapbox.com/",
+	"https://kit.fontawesome.com/",
+	"https://cdnjs.cloudflare.com/",
+];
+
+const styleSrcUrls = [
+	"'self'",
+	"'unsafe-inline'",
+	"https://cdn.maptiler.com/",
+	"https://cdn.jsdelivr.net/",
+	"https://stackpath.bootstrapcdn.com/",
+	"https://fonts.googleapis.com/",
+	"https://cdnjs.cloudflare.com/",
+];
+
+const connectSrcUrls = [
+	"'self'",
+	"https://api.maptiler.com/",
+	"https://a.tiles.mapbox.com/",
+	"https://b.tiles.mapbox.com/",
+	"https://events.mapbox.com/",
+];
+
+const imgSrcUrls = [
+	"'self'",
+	"data:",
+	"blob:",
+	"https://res.cloudinary.com/",
+	"https://images.unsplash.com/",
+	"https://api.maptiler.com/",
+	"https://*.tile.openstreetmap.org/",
+];
+
+app.use(
+	helmet.contentSecurityPolicy({
+		directives: {
+			defaultSrc: ["'self'"],
+			scriptSrc: [...scriptSrcUrls],
+			scriptSrcElem: [...scriptSrcUrls],
+			styleSrc: [...styleSrcUrls],
+			styleSrcElem: [...styleSrcUrls],
+			imgSrc: [...imgSrcUrls],
+			connectSrc: [...connectSrcUrls],
+			fontSrc: ["'self'", "https://fonts.gstatic.com/"],
+			workerSrc: ["'self'", "blob:"], // ✅ Allow Web Workers
+			childSrc: ["'self'", "blob:"], // ✅ Allow iframes & workers
+		},
+	})
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
