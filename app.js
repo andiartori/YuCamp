@@ -1,5 +1,4 @@
-	require("dotenv").config();
-
+require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
@@ -69,65 +68,65 @@ app.use(session(sessionConfig));
 
 app.use(flash());
 
-app.use(helmet());
+// app.use(helmet());
 
-const scriptSrcUrls = [
-	"'self'",
-	"'unsafe-inline'",
-	"https://cdn.maptiler.com/",
-	"https://cdn.jsdelivr.net/",
-	"https://stackpath.bootstrapcdn.com/",
-	"https://api.tiles.mapbox.com/",
-	"https://api.maptiler.com/",
-	"https://api.mapbox.com/",
-	"https://kit.fontawesome.com/",
-	"https://cdnjs.cloudflare.com/",
-];
+// const scriptSrcUrls = [
+// 	"'self'",
+// 	"'unsafe-inline'",
+// 	"https://cdn.maptiler.com/",
+// 	"https://cdn.jsdelivr.net/",
+// 	"https://stackpath.bootstrapcdn.com/",
+// 	"https://api.tiles.mapbox.com/",
+// 	"https://api.maptiler.com/",
+// 	"https://api.mapbox.com/",
+// 	"https://kit.fontawesome.com/",
+// 	"https://cdnjs.cloudflare.com/",
+// ];
 
-const styleSrcUrls = [
-	"'self'",
-	"'unsafe-inline'",
-	"https://cdn.maptiler.com/",
-	"https://cdn.jsdelivr.net/",
-	"https://stackpath.bootstrapcdn.com/",
-	"https://fonts.googleapis.com/",
-	"https://cdnjs.cloudflare.com/",
-];
+// const styleSrcUrls = [
+// 	"'self'",
+// 	"'unsafe-inline'",
+// 	"https://cdn.maptiler.com/",
+// 	"https://cdn.jsdelivr.net/",
+// 	"https://stackpath.bootstrapcdn.com/",
+// 	"https://fonts.googleapis.com/",
+// 	"https://cdnjs.cloudflare.com/",
+// ];
 
-const connectSrcUrls = [
-	"'self'",
-	"https://api.maptiler.com/",
-	"https://a.tiles.mapbox.com/",
-	"https://b.tiles.mapbox.com/",
-	"https://events.mapbox.com/",
-];
+// const connectSrcUrls = [
+// 	"'self'",
+// 	"https://api.maptiler.com/",
+// 	"https://a.tiles.mapbox.com/",
+// 	"https://b.tiles.mapbox.com/",
+// 	"https://events.mapbox.com/",
+// ];
 
-const imgSrcUrls = [
-	"'self'",
-	"data:",
-	"blob:",
-	"https://res.cloudinary.com/",
-	"https://images.unsplash.com/",
-	"https://api.maptiler.com/",
-	"https://*.tile.openstreetmap.org/",
-];
+// const imgSrcUrls = [
+// 	"'self'",
+// 	"data:",
+// 	"blob:",
+// 	"https://res.cloudinary.com/",
+// 	"https://images.unsplash.com/",
+// 	"https://api.maptiler.com/",
+// 	"https://*.tile.openstreetmap.org/",
+// ];
 
-app.use(
-	helmet.contentSecurityPolicy({
-		directives: {
-			defaultSrc: ["'self'"],
-			scriptSrc: [...scriptSrcUrls],
-			scriptSrcElem: [...scriptSrcUrls],
-			styleSrc: [...styleSrcUrls],
-			styleSrcElem: [...styleSrcUrls],
-			imgSrc: [...imgSrcUrls],
-			connectSrc: [...connectSrcUrls],
-			fontSrc: ["'self'", "https://fonts.gstatic.com/"],
-			workerSrc: ["'self'", "blob:"], // ✅ Allow Web Workers
-			childSrc: ["'self'", "blob:"], // ✅ Allow iframes & workers
-		},
-	})
-);
+// app.use(
+// 	helmet.contentSecurityPolicy({
+// 		directives: {
+// 			defaultSrc: ["'self'"],
+// 			scriptSrc: [...scriptSrcUrls],
+// 			scriptSrcElem: [...scriptSrcUrls],
+// 			styleSrc: [...styleSrcUrls],
+// 			styleSrcElem: [...styleSrcUrls],
+// 			imgSrc: [...imgSrcUrls],
+// 			connectSrc: [...connectSrcUrls],
+// 			fontSrc: ["'self'", "https://fonts.gstatic.com/"],
+// 			workerSrc: ["'self'", "blob:"], // ✅ Allow Web Workers
+// 			childSrc: ["'self'", "blob:"], // ✅ Allow iframes & workers
+// 		},
+// 	})
+// );
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -146,7 +145,7 @@ app.use((req, res, next) => {
 app.use("/", userRoutes);
 app.use("/campgrounds", campgroundsRoutes);
 app.use("/campgrounds/:id/reviews", reviewsRoutes);
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
 	res.render("home");
