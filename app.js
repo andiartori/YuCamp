@@ -20,9 +20,8 @@ const userRoutes = require("./routes/users");
 const campgroundsRoutes = require("./routes/campgrounds");
 const reviewsRoutes = require("./routes/reviews");
 const dbUrl = process.env.DB_URL;
-const mySecret = process.env.SECRET
+const mySecret = process.env.SECRET;
 const MongoStore = require("connect-mongo");
-
 
 //This is local "mongodb://127.0.0.1:27017/yelp-camp"
 
@@ -165,6 +164,11 @@ app.use((err, req, res, next) => {
 	res.status(statusCode).render("error", { err });
 });
 
-app.listen(3000, () => {
-	console.log("Serving Server 3000");
-});
+module.exports = app;
+
+if (require.main === module) {
+	const PORT = process.env.PORT || 3000;
+	app.listen(PORT, () => {
+		console.log(`Server running on port ${PORT}`);
+	});
+}
