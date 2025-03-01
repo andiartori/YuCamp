@@ -55,23 +55,25 @@ store.on("error", function (e) {
 	console.error("Session store error: ", e);
 });
 const sessionConfig = {
-	store,
-	name: "session",
 	secret: mySecret,
 	resave: false,
 	saveUninitialized: true,
-	cookie: {
-		httpOnly: true,
-		// secure : true,
-		expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-		maxAge: Date.now() + 1000 * 60 * 60 * 24 * 7,
-	},
+	cookie: { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 },
 };
+
 app.use(session(sessionConfig));
 
 app.use(flash());
 
 app.use(helmet());
+
+mongoose.set("strictQuery", true); // Avoid warnings
+mongoose.set("bufferCommands", false); // Prevent long waits
+mongoose
+  .connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("✅ MongoDB connected!"))
+  .catch((err) => console.error("❌ MongoDB connection failed:", err));
+
 
 const scriptSrcUrls = [
 	"'self'",
