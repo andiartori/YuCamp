@@ -27,7 +27,7 @@ const MongoStore = require("connect-mongo");
 //This is local "mongodb://127.0.0.1:27017/yelp-camp"
 
 mongoose
-	.connect("mongodb://127.0.0.1:27017/yelp-camp")
+	.connect(dbUrl)
 	.then(() => {
 		console.log("MONGO CONNECTION SUCCESS");
 	})
