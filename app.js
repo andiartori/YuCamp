@@ -18,7 +18,7 @@ const userRoutes = require("./routes/users");
 const campgroundsRoutes = require("./routes/campgrounds");
 const reviewsRoutes = require("./routes/reviews");
 const dbUrl = process.env.DB_URL;
-const mySecret = process.env.SECRET;
+const secret = process.env.SECRET;
 const MongoStore = require("connect-mongo");
 
 //This is local "mongodb://127.0.0.1:27017/yelp-camp"
@@ -45,7 +45,7 @@ const store = MongoStore.create({
 	mongoUrl: dbUrl,
 	touchAfter: 24 * 60 * 60,
 	crypto: {
-		secret: mySecret,
+		secret,
 	},
 });
 
@@ -53,17 +53,18 @@ store.on("error", function (e) {
 	console.error("Session store error: ", e);
 });
 const sessionConfig = {
-	store,
-	name: "session",
-	secret: mySecret,
-	resave: false,
-	saveUninitialized: true,
-	cookie: {
-		secure: true,
-		expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-		maxAge: Date.now() + 1000 * 60 * 60 * 24 * 7,
-	},
-};
+    store,
+    name: 'session',
+    secret,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        // secure: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
+}
 app.use(session(sessionConfig));
 
 app.use(flash());
